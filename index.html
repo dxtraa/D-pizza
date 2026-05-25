@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPizza - Aplikasi Pemesanan Restoran & Simulator Terminal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono (untuk nuansa terminal) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .terminal-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-500 text-slate-950 p-2 rounded-lg font-black text-xl tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-pizza-slice animate-bounce"></i> D'PIZZA
+                </div>
+                <div>
+                    <h1 class="text-xs font-semibold text-amber-500 uppercase tracking-widest">Tubes Daskom Simulator</h1>
+                    <p class="text-[10px] text-slate-400">Terminal & GUI Hybrid Concept</p>
+                </div>
+            </div>
+            
+            <!-- Quick Stats & Current Session Info -->
+            <div class="flex items-center gap-4 text-xs">
+                <div id="session-badge" class="bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" id="session-dot"></span>
+                    <span id="session-text" class="text-slate-300 font-medium">Guest Mode</span>
+                </div>
+                <div id="user-balance-display" class="hidden bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-full font-bold">
+                    Saldo: Rp <span id="nav-balance">0</span>
+                </div>
+                <button onclick="resetSystemState()" class="text-slate-400 hover:text-red-400 transition-colors flex items-center gap-1 text-xs" title="Reset Semua Data ke Default">
+                    <i class="fa-solid fa-rotate"></i> Reset Data
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto p-4 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Terminal / Code Simulation Visualizer (4/12 cols) -->
+        <section class="lg:col-span-4 flex flex-col gap-4">
+            <div class="bg-slate-900 rounded-xl border border-slate-800 flex flex-col h-[550px] overflow-hidden shadow-2xl">
+                <!-- Terminal Header -->
+                <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-slate-400 font-semibold ml-2 terminal-font">daskom-terminal@dpizza:~$</span>
+                    </div>
+                    <span class="bg-slate-800 text-[10px] text-amber-400 px-2 py-0.5 rounded uppercase font-bold tracking-wider terminal-font">DEBUGGER</span>
+                </div>
+
+                <!-- Terminal Display Screen -->
+                <div id="terminal-screen" class="flex-grow p-4 bg-slate-950 text-slate-300 overflow-y-auto terminal-font text-xs space-y-2">
+                    <div class="text-slate-500">// Selamat datang di Simulator DPizza Tubes Daskom!</div>
+                    <div class="text-slate-500">// Setiap aksi yang Anda lakukan di menu sebelah kanan</div>
+                    <div class="text-slate-500">// akan memicu visualisasi eksekusi algoritma di sini.</div>
+                    <div class="text-amber-500">[System] Inisialisasi program DPizza berhasil...</div>
+                    <div class="text-emerald-400">[Data] Memuat database menu & pengguna awal.</div>
+                    <div class="border-t border-slate-900 my-2"></div>
+                </div>
+
+                <!-- Live Pseudo-code Visualizer Box -->
+                <div class="bg-slate-900 border-t border-slate-800 p-3 h-48 overflow-y-auto">
+                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-2 flex justify-between items-center">
+                        <span>Alur Kode Daskom Aktif</span>
+                        <span class="text-xs text-amber-500 font-mono" id="current-algo-name">Algoritma: Idle</span>
+                    </div>
+                    <pre id="code-visualizer" class="text-[10px] text-slate-300 terminal-font leading-relaxed">
+// Menunggu interaksi dari GUI...
+// Klik tombol login, cari, atau urutkan data
+// untuk melihat potongan logika C++ / Python program ini.
+                    </pre>
+                </div>
+            </div>
+
+            <!-- Developer / Student Info -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-xl border border-slate-800 flex items-center gap-4">
+                <div class="bg-slate-800/80 p-3 rounded-lg text-slate-300 text-xl border border-slate-700">
+                    <i class="fa-solid fa-graduation-cap text-amber-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs text-slate-400 font-bold tracking-wider uppercase">IDENTITAS MAHASISWA</h3>
+                    <p class="text-sm font-bold text-slate-100">Nama Praktikan Tubes</p>
+                    <p class="text-xs text-slate-400">NIM: 120XXXXXXXX · Kelas: IF-XX-XX</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Interactive Simulator UI (8/12 cols) -->
+        <section class="lg:col-span-8 flex flex-col gap-6">
+            
+            <!-- 1. LANDING SCREEN / ROLE SELECTOR (Initial State) -->
+            <div id="view-landing" class="bg-slate-900 rounded-xl border border-slate-800 p-8 text-center flex flex-col items-center justify-center min-h-[450px] shadow-lg">
+                <div class="w-20 h-20 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-full flex items-center justify-center text-4xl mb-6">
+                    <i class="fa-solid fa-pizza-slice"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Selamat Datang di DPizza</h2>
+                <p class="text-slate-400 max-w-md mx-auto text-sm mb-8">
+                    Silakan pilih peran Anda untuk memulai simulasi sistem kasir dan manajemen restoran berbasis terminal.
+                </p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
+                    <!-- User Button -->
+                    <button onclick="switchView('view-user-login')" class="group bg-slate-800 hover:bg-slate-700/80 p-6 rounded-xl border border-slate-700 hover:border-amber-500/50 text-left transition-all duration-300 flex flex-col justify-between">
+                        <div class="flex justify-between items-center w-full mb-4">
+                            <span class="p-3 bg-amber-500/10 text-amber-400 rounded-lg group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
+                                <i class="fa-solid fa-users"></i>
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-mono tracking-wider font-bold">ROLE: USER</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-slate-200 mb-1">Masuk Sebagai Pelanggan</h3>
+                            <p class="text-xs text-slate-400">Pesan menu, top-up saldo, cari riwayat, dan bayar.</p>
+                        </div>
+                    </button>
+                    
+                    <!-- Admin Button -->
+                    <button onclick="switchView('view-admin-login')" class="group bg-slate-800 hover:bg-slate-700/80 p-6 rounded-xl border border-slate-700 hover:border-red-500/50 text-left transition-all duration-300 flex flex-col justify-between">
+                        <div class="flex justify-between items-center w-full mb-4">
+                            <span class="p-3 bg-red-500/10 text-red-400 rounded-lg group-hover:bg-red-500 group-hover:text-slate-950 transition-colors">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-mono tracking-wider font-bold">ROLE: ADMIN</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-slate-200 mb-1">Masuk Sebagai Admin</h3>
+                            <p class="text-xs text-slate-400">Kelola menu, atur diskon promo, & pantau laporan keuangan.</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. USER LOGIN VIEW -->
+            <div id="view-user-login" class="hidden bg-slate-900 rounded-xl border border-slate-800 p-6 shadow-lg">
+                <div class="flex items-center gap-3 mb-6">
+                    <button onclick="goHome()" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-arrow-left"></i></button>
+                    <h2 class="text-lg font-bold">Login Pelanggan <span class="text-xs text-amber-500 font-mono ml-2">(Simulasi Do-While Loop)</span></h2>
+                </div>
+                
+                <div class="max-w-md mx-auto bg-slate-950 p-6 rounded-xl border border-slate-800">
+                    <div id="user-attempts-warning" class="bg-amber-950/50 border border-amber-500/20 text-amber-400 text-xs p-3 rounded-lg mb-4 text-center">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Sisa Kesempatan Login: <strong id="user-login-attempts">3</strong> kali.
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Username</label>
+                            <input type="text" id="user-login-username" placeholder="Masukkan username (default: budi)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Password</label>
+                            <input type="password" id="user-login-password" placeholder="Masukkan password (default: budi123)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 text-sm">
+                        </div>
+                        
+                        <button onclick="handleUserLogin()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 px-4 rounded-lg transition-colors text-sm">
+                            Masuk Ke Akun
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+                        <p class="text-xs text-slate-400">Belum punya akun? <button onclick="toggleUserRegModal(true)" class="text-amber-400 hover:underline font-semibold">Registrasi Sekarang</button></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. ADMIN LOGIN VIEW -->
+            <div id="view-admin-login" class="hidden bg-slate-900 rounded-xl border border-slate-800 p-6 shadow-lg">
+                <div class="flex items-center gap-3 mb-6">
+                    <button onclick="goHome()" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-arrow-left"></i></button>
+                    <h2 class="text-lg font-bold">Login Admin <span class="text-xs text-red-500 font-mono ml-2">(Simulasi While Loop)</span></h2>
+                </div>
+                
+                <div class="max-w-md mx-auto bg-slate-950 p-6 rounded-xl border border-slate-800">
+                    <div id="admin-attempts-warning" class="bg-red-950/50 border border-red-500/20 text-red-400 text-xs p-3 rounded-lg mb-4 text-center">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Sisa Kesempatan Login Admin: <strong id="admin-login-attempts">3</strong> kali.
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Username Admin</label>
+                            <input type="text" id="admin-login-username" placeholder="Masukkan username admin (admin)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Password Admin</label>
+                            <input type="password" id="admin-login-password" placeholder="Masukkan password admin (admin123)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm">
+                        </div>
+                        
+                        <button onclick="handleAdminLogin()" class="w-full bg-red-500 hover:bg-red-400 text-slate-950 font-bold py-2 px-4 rounded-lg transition-colors text-sm">
+                            Masuk sebagai Admin
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. USER DASHBOARD (Order Page) -->
+            <div id="view-user-dashboard" class="hidden flex flex-col gap-6">
+                <!-- User Sub Navbar / Actions -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex gap-2">
+                        <button onclick="setUserTab('order')" id="tab-btn-order" class="bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-basket-shopping mr-1"></i> Pesan Menu</button>
+                        <button onclick="setUserTab('history')" id="tab-btn-history" class="bg-slate-800 hover:bg-slate-750 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Riwayat & Cari Transaksi</button>
+                        <button onclick="setUserTab('topup')" id="tab-btn-topup" class="bg-slate-800 hover:bg-slate-750 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-wallet mr-1"></i> Top-Up Saldo</button>
+                    </div>
+                    <button onclick="logout()" class="text-xs bg-red-950/60 text-red-400 hover:bg-red-900/50 border border-red-500/20 px-3 py-1.5 rounded-lg font-bold"><i class="fa-solid fa-sign-out-alt mr-1"></i> Keluar</button>
+                </div>
+
+                <!-- SUB VIEW: ORDER TAB -->
+                <div id="user-tab-order" class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                    <!-- Categories & Product Grid (8 cols) -->
+                    <div class="xl:col-span-8 flex flex-col gap-4">
+                        <!-- Dine-in / Takeaway Selector -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tipe Pesanan</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="flex items-center gap-3 p-3 bg-slate-950 rounded-lg border border-slate-800 cursor-pointer select-none">
+                                    <input type="radio" name="orderType" value="Dine-in" checked onchange="changeOrderType(this.value)" class="accent-amber-500 h-4 w-4">
+                                    <div>
+                                        <p class="text-xs font-bold">Dine-In (Makan di Tempat)</p>
+                                        <p class="text-[10px] text-slate-400">Pilih nomor meja</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 bg-slate-950 rounded-lg border border-slate-800 cursor-pointer select-none">
+                                    <input type="radio" name="orderType" value="Takeaway" onchange="changeOrderType(this.value)" class="accent-amber-500 h-4 w-4">
+                                    <div>
+                                        <p class="text-xs font-bold">Takeaway (Bawa Pulang)</p>
+                                        <p class="text-[10px] text-slate-400">Pesanan dibungkus kotak</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Categories Filter & Sorting Row -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-4 items-center justify-between">
+                            <div class="flex gap-2 items-center overflow-x-auto max-w-full pb-1 sm:pb-0" id="user-categories-container">
+                                <!-- Populated dynamically by JS -->
+                            </div>
+                            
+                            <!-- Sort Button -->
+                            <button onclick="sortMenuData()" class="bg-slate-950 hover:bg-slate-800 border border-slate-700 hover:border-amber-500 text-slate-300 hover:text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all">
+                                <i class="fa-solid fa-arrow-down-a-z"></i> Urutkan Abjad
+                            </button>
+                        </div>
+
+                        <!-- Menu Listing Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="user-menu-grid">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Cart Sidebar (4 cols) -->
+                    <div class="xl:col-span-4 flex flex-col gap-4">
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between h-[500px]">
+                            <div>
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                                    <h3 class="font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-amber-500"></i> Keranjang Belanja</h3>
+                                    <span id="cart-item-count" class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">0 Item</span>
+                                </div>
+
+                                <!-- Dynamic Cart Items List -->
+                                <div id="cart-items-container" class="space-y-3 overflow-y-auto max-h-[220px] pr-1">
+                                    <!-- Populated dynamically -->
+                                    <div class="text-center text-slate-500 py-10 text-xs">Keranjang masih kosong</div>
+                                </div>
+                            </div>
+
+                            <!-- Cart Summary Footer -->
+                            <div class="border-t border-slate-800 pt-4 space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Subtotal:</span>
+                                    <span class="font-semibold text-slate-200">Rp <span id="cart-subtotal">0</span></span>
+                                </div>
+                                <div class="flex justify-between items-center text-emerald-400" id="cart-discount-row">
+                                    <span class="text-slate-400">Potongan Promo:</span>
+                                    <span class="font-bold">- Rp <span id="cart-discount">0</span></span>
+                                </div>
+                                <div class="flex justify-between text-sm pt-2 border-t border-slate-800/50">
+                                    <span class="font-bold text-slate-300">Total Akhir:</span>
+                                    <span class="font-black text-amber-500">Rp <span id="cart-total">0</span></span>
+                                </div>
+                                <button onclick="checkoutCart()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 mt-2">
+                                    <i class="fa-solid fa-credit-card"></i> Bayar & Selesaikan Pesanan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB VIEW: TRANSACTION HISTORY TAB -->
+                <div id="user-tab-history" class="hidden bg-slate-900 rounded-xl border border-slate-800 p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <h3 class="font-bold text-lg">Riwayat Pemesanan Anda</h3>
+                            <p class="text-xs text-slate-400">Pantau semua pesanan dan struk belanja Anda di sini.</p>
+                        </div>
+                        
+                        <!-- Search Bar -->
+                        <div class="relative max-w-sm w-full">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="date" id="history-search-date" onchange="searchHistoryByDate()" class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-slate-200 focus:outline-none focus:border-amber-500 text-xs">
+                        </div>
+                    </div>
+
+                    <!-- History Table/Cards -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+                                <tr>
+                                    <th class="px-4 py-3">ID Transaksi</th>
+                                    <th class="px-4 py-3">Tanggal</th>
+                                    <th class="px-4 py-3">Tipe</th>
+                                    <th class="px-4 py-3">Menu Dipesan</th>
+                                    <th class="px-4 py-3">Diskon</th>
+                                    <th class="px-4 py-3">Total Belanja</th>
+                                    <th class="px-4 py-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-history-tbody" class="divide-y divide-slate-800">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="history-empty" class="hidden text-center py-10 text-slate-500 text-xs">
+                        Tidak ada riwayat transaksi yang cocok dengan pencarian Anda.
+                    </div>
+                </div>
+
+                <!-- SUB VIEW: TOP-UP TAB -->
+                <div id="user-tab-topup" class="hidden bg-slate-900 rounded-xl border border-slate-800 p-6 max-w-md mx-auto">
+                    <h3 class="font-bold text-lg mb-2 text-center">Top-Up Saldo D-Pizza</h3>
+                    <p class="text-xs text-slate-400 text-center mb-6">Isi ulang saldo Anda secara instan untuk melakukan pembayaran instan tanpa repot.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                            <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">Saldo Anda Sekarang</p>
+                            <p class="text-2xl font-black text-emerald-400">Rp <span id="topup-current-balance">0</span></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Pilih Nominal Top-Up</label>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button onclick="selectTopupAmount(25000)" class="bg-slate-800 hover:bg-slate-750 text-xs py-2 rounded-lg font-bold border border-slate-700 hover:border-amber-500 transition-all">Rp 25.000</button>
+                                <button onclick="selectTopupAmount(50000)" class="bg-slate-800 hover:bg-slate-750 text-xs py-2 rounded-lg font-bold border border-slate-700 hover:border-amber-500 transition-all">Rp 50.000</button>
+                                <button onclick="selectTopupAmount(100000)" class="bg-slate-800 hover:bg-slate-750 text-xs py-2 rounded-lg font-bold border border-slate-700 hover:border-amber-500 transition-all">Rp 100.000</button>
+                                <button onclick="selectTopupAmount(200000)" class="bg-slate-800 hover:bg-slate-750 text-xs py-2 rounded-lg font-bold border border-slate-700 hover:border-amber-500 transition-all">Rp 200.000</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Atau Nominal Kustom</label>
+                            <input type="number" id="topup-custom-amount" placeholder="Contoh: 15000" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-500 text-sm">
+                        </div>
+
+                        <button onclick="handleTopup()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wallet"></i> Proses Isi Ulang Saldo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. ADMIN DASHBOARD -->
+            <div id="view-admin-dashboard" class="hidden flex flex-col gap-6">
+                <!-- Admin Sub Navbar / Actions -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex gap-2">
+                        <button onclick="setAdminTab('menu')" id="admin-tab-btn-menu" class="bg-red-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-utensils mr-1"></i> Manajemen Menu</button>
+                        <button onclick="setAdminTab('users')" id="admin-tab-btn-users" class="bg-slate-800 hover:bg-slate-750 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-users mr-1"></i> Manajemen User</button>
+                        <button onclick="setAdminTab('reports')" id="admin-tab-btn-reports" class="bg-slate-800 hover:bg-slate-750 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-chart-line mr-1"></i> Laporan Keuangan</button>
+                    </div>
+                    <button onclick="logout()" class="text-xs bg-red-950/60 text-red-400 hover:bg-red-900/50 border border-red-500/20 px-3 py-1.5 rounded-lg font-bold"><i class="fa-solid fa-sign-out-alt mr-1"></i> Keluar</button>
+                </div>
+
+                <!-- SUB VIEW: ADMIN MANAJEMEN MENU -->
+                <div id="admin-tab-menu" class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                    <!-- Categories Management (4 cols) -->
+                    <div class="xl:col-span-4 bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between min-h-[300px]">
+                        <div>
+                            <h3 class="font-bold text-sm mb-4 pb-2 border-b border-slate-800 flex items-center justify-between">
+                                <span>Manajemen Kategori</span>
+                                <button onclick="openCategoryModal()" class="text-xs bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center gap-1"><i class="fa-solid fa-plus text-[10px]"></i> Baru</button>
+                            </h3>
+                            <div class="space-y-2 overflow-y-auto max-h-[250px]" id="admin-categories-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menus Management (8 cols) -->
+                    <div class="xl:col-span-8 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                            <h3 class="font-bold text-sm">Daftar Menu Restoran</h3>
+                            <button onclick="openMenuModal()" class="text-xs bg-amber-500 text-slate-950 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="fa-solid fa-plus text-[10px]"></i> Tambah Menu Baru</button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+                                    <tr>
+                                        <th class="px-4 py-3">Nama Menu</th>
+                                        <th class="px-4 py-3">Kategori</th>
+                                        <th class="px-4 py-3">Harga</th>
+                                        <th class="px-4 py-3">Tag</th>
+                                        <th class="px-4 py-3 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-menu-tbody" class="divide-y divide-slate-800">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB VIEW: ADMIN MANAJEMEN USER -->
+                <div id="admin-tab-users" class="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <h3 class="font-bold text-lg">Daftar Pelanggan Terdaftar</h3>
+                            <p class="text-xs text-slate-400 font-medium">Lacak biodata pelanggan dan saldo mereka dalam database.</p>
+                        </div>
+                        
+                        <!-- Search Bar User -->
+                        <div class="relative max-w-sm w-full">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="admin-search-user-input" onkeyup="searchUsersByName()" placeholder="Cari pelanggan berdasarkan nama..." class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-red-500 text-xs">
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+                                <tr>
+                                    <th class="px-4 py-3">Username</th>
+                                    <th class="px-4 py-3">Nama Lengkap</th>
+                                    <th class="px-4 py-3">Saldo Akun</th>
+                                    <th class="px-4 py-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-tbody" class="divide-y divide-slate-800">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUB VIEW: ADMIN LAPORAN KEUANGAN & PROMO -->
+                <div id="admin-tab-reports" class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                    <!-- Promo Settings (4 cols) -->
+                    <div class="xl:col-span-4 bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col gap-4">
+                        <div>
+                            <h3 class="font-bold text-sm mb-2 pb-2 border-b border-slate-800"><i class="fa-solid fa-percent text-red-500"></i> Pengaturan Promo Pembelian</h3>
+                            <p class="text-xs text-slate-400 mb-4">Setel minimal transaksi pembelanjaan untuk mengaktifkan potongan diskon otomatis.</p>
+                        </div>
+                        
+                        <div class="space-y-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Min. Pembelian (Rp)</label>
+                                <input type="number" id="promo-min-purchase" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-red-500 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Potongan Diskon (Rp)</label>
+                                <input type="number" id="promo-discount-amount" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-red-500 text-xs">
+                            </div>
+                            
+                            <button onclick="savePromoSettings()" class="w-full bg-red-500 hover:bg-red-400 text-slate-950 font-bold py-2 px-4 rounded-lg transition-colors text-xs">
+                                Update Aturan Promo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sales Reports (8 cols) -->
+                    <div class="xl:col-span-8 bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col gap-6">
+                        <!-- Revenue Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Pendapatan</p>
+                                    <p class="text-xl font-bold text-emerald-400 mt-1">Rp <span id="admin-total-income">0</span></p>
+                                </div>
+                                <span class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa-solid fa-coins text-lg"></i></span>
+                            </div>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Transaksi Berhasil</p>
+                                    <p class="text-xl font-bold text-amber-500 mt-1"><span id="admin-total-orders">0</span> Pesanan</p>
+                                </div>
+                                <span class="p-3 bg-amber-500/10 text-amber-400 rounded-lg"><i class="fa-solid fa-receipt text-lg"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- All Sales History Table -->
+                        <div>
+                            <h3 class="font-bold text-sm mb-4 pb-2 border-b border-slate-800">Detail Pembelian Pelanggan</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-950 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+                                        <tr>
+                                            <th class="px-4 py-3">ID / Pelanggan</th>
+                                            <th class="px-4 py-3">Tanggal</th>
+                                            <th class="px-4 py-3">Item Dipesan</th>
+                                            <th class="px-4 py-3">Diskon</th>
+                                            <th class="px-4 py-3">Subtotal</th>
+                                            <th class="px-4 py-3">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-reports-tbody" class="divide-y divide-slate-800">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-6 px-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <p>© 2026 DPizza Resto - Tugas Besar Dasar Komputer & Pemrograman</p>
+            <p class="flex items-center gap-2">Built with <i class="fa-solid fa-heart text-red-500"></i> in Bojongsoang, West Java</p>
+        </div>
+    </footer>
+
+    <!-- ==================== MODALS & POP-UPS ==================== -->
+
+    <!-- USER REGISTRATION MODAL -->
+    <div id="modal-user-register" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 w-full max-w-sm">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h3 class="font-bold text-base flex items-center gap-2 text-amber-500"><i class="fa-solid fa-user-plus"></i> Registrasi Akun</h3>
+                <button onclick="toggleUserRegModal(false)" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Username Baru</label>
+                    <input type="text" id="reg-username" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Lengkap</label>
+                    <input type="text" id="reg-fullname" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Password</label>
+                    <input type="password" id="reg-password" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-500">
+                </div>
+                
+                <button onclick="handleUserRegister()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-lg transition-colors">
+                    Daftar Akun
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STRUK PEMBAYARAN MODAL (RECEIPT) -->
+    <div id="modal-receipt" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 w-full max-w-sm flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <span class="text-xs text-amber-500 font-mono"><i class="fa-solid fa-print"></i> CETAK STRUK PEMBAYARAN</span>
+                <button onclick="closeReceiptModal()" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Real Paper Receipt Simulation -->
+            <div class="bg-white text-slate-950 p-6 rounded shadow-lg terminal-font text-xs flex flex-col gap-2">
+                <div class="text-center">
+                    <h3 class="font-black text-sm tracking-wider uppercase">D'PIZZA RESTO</h3>
+                    <p class="text-[9px]">Bojongsoang, Bandung Regency</p>
+                    <p class="text-[9px]">TELP: 022-123456</p>
+                    <div class="border-t border-dashed border-slate-400 my-2"></div>
+                </div>
+                
+                <div class="space-y-1 text-[10px]">
+                    <div class="flex justify-between"><span>No. Transaksi:</span><span class="font-bold" id="rec-id">TRX-0000</span></div>
+                    <div class="flex justify-between"><span>Tanggal:</span><span id="rec-date">2026-05-25</span></div>
+                    <div class="flex justify-between"><span>Pelanggan:</span><span id="rec-user">Guest</span></div>
+                    <div class="flex justify-between"><span>Tipe Order:</span><span id="rec-type">Dine-in</span></div>
+                </div>
+                
+                <div class="border-t border-dashed border-slate-400 my-2"></div>
+                
+                <!-- Items Table -->
+                <div class="space-y-1" id="rec-items-list">
+                    <!-- Populated dynamically -->
+                </div>
+                
+                <div class="border-t border-dashed border-slate-400 my-2"></div>
+                
+                <div class="space-y-1 text-right text-[10px]">
+                    <div class="flex justify-between"><span>Subtotal:</span><span>Rp <span id="rec-subtotal">0</span></span></div>
+                    <div class="flex justify-between text-emerald-700"><span>Diskon Promo:</span><span>-Rp <span id="rec-discount">0</span></span></div>
+                    <div class="flex justify-between font-bold text-xs pt-1 border-t border-slate-300"><span>TOTAL BAYAR:</span><span>Rp <span id="rec-total">0</span></span></div>
+                </div>
+                
+                <div class="border-t border-dashed border-slate-400 my-3"></div>
+                <div class="text-center text-[9px] space-y-1 text-slate-500">
+                    <p class="font-bold">TERIMA KASIH ATAS KUNJUNGAN ANDA</p>
+                    <p>Selamat menikmati pizza terbaik kami!</p>
+                </div>
+            </div>
+
+            <button onclick="window.print()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2">
+                <i class="fa-solid fa-print"></i> Cetak ke Printer Fisik
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN: CATEGORY CREATE/EDIT MODAL -->
+    <div id="modal-category-edit" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 w-full max-w-sm">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h3 id="category-modal-title" class="font-bold text-base text-red-500">Tambah Kategori Baru</h3>
+                <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Kategori</label>
+                    <input type="text" id="cat-input-name" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-red-500">
+                </div>
+                <input type="hidden" id="cat-input-id">
+                
+                <button onclick="saveCategory()" class="w-full bg-red-500 hover:bg-red-400 text-slate-950 font-bold py-2 rounded-lg transition-colors">
+                    Simpan Kategori
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN: MENU CREATE/EDIT MODAL -->
+    <div id="modal-menu-edit" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 w-full max-w-sm">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h3 id="menu-modal-title" class="font-bold text-base text-red-500">Tambah Menu Baru</h3>
+                <button onclick="closeMenuModal()" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Menu</label>
+                    <input type="text" id="menu-input-name" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Kategori</label>
+                    <select id="menu-input-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-red-500">
+                        <!-- Filled by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Harga (Rp)</label>
+                    <input type="number" id="menu-input-price" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Rekomendasi / Best Seller?</label>
+                    <select id="menu-input-bestseller" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-red-500">
+                        <option value="false">Tidak</option>
+                        <option value="true">Ya (Best Seller)</option>
+                    </select>
+                </div>
+                <input type="hidden" id="menu-input-id">
+                
+                <button onclick="saveMenu()" class="w-full bg-red-500 hover:bg-red-400 text-slate-950 font-bold py-2 rounded-lg transition-colors">
+                    Simpan Data Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GENERAL ALERT DIALOG (Avoids raw browser alert as per rule) -->
+    <div id="custom-alert" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <div class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl mb-4 bg-amber-500/10 text-amber-500" id="alert-icon-wrapper">
+                <i class="fa-solid fa-circle-info" id="alert-icon"></i>
+            </div>
+            <h3 class="font-bold text-slate-100 mb-2 text-base" id="alert-title">Informasi</h3>
+            <p class="text-slate-400 text-xs leading-relaxed mb-6" id="alert-message">Konten pesan.</p>
+            <button onclick="closeCustomAlert()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold py-2 px-6 rounded-lg text-xs transition-colors">
+                Oke
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== LOGIKA PROGRAM / JAVASCRIPT ==================== -->
+    <script>
+        // --- DATA DEFAULTS & DATABASE AWAL ---
+        const DEFAULT_CATEGORIES = ["Pizza", "Pasta", "Minuman", "Snacks"];
+        const DEFAULT_MENUS = [
+            { id: 1, name: "Margherita Supreme", category: "Pizza", price: 65000, bestSeller: true },
+            { id: 2, name: "Texas Meat Lovers", category: "Pizza", price: 85000, bestSeller: true },
+            { id: 3, name: "Tuna Delight Crust", category: "Pizza", price: 78000, bestSeller: false },
+            { id: 4, name: "Spaghetti Carbonara Creamy", category: "Pasta", price: 45000, bestSeller: true },
+            { id: 5, name: "Fettuccine Alfredo", category: "Pasta", price: 48000, bestSeller: false },
+            { id: 6, name: "Premium Garlic Bread", category: "Snacks", price: 25000, bestSeller: true },
+            { id: 7, name: "Sweet Iced Lemon Tea", category: "Minuman", price: 15000, bestSeller: false },
+            { id: 8, name: "Choco Milkshake", category: "Minuman", price: 20000, bestSeller: true }
+        ];
+
+        const DEFAULT_USERS = [
+            { username: "budi", password: "budi123", fullname: "Budi Setiawan", balance: 150000 },
+            { username: "dewi", password: "dewi123", fullname: "Dewi Lestari", balance: 75000 },
+            { username: "asisten", password: "123", fullname: "Kak Asisten Daskom", balance: 500000 }
+        ];
+
+        const DEFAULT_PROMO = {
+            minPurchase: 50000,
+            discount: 10000
+        };
+
+        const DEFAULT_HISTORY = [
+            { id: "TRX-4209", username: "budi", date: "2026-05-25", items: [{ name: "Texas Meat Lovers", price: 85000, qty: 1 }], type: "Dine-in", discount: 10000, subtotal: 85000, total: 75000 },
+            { id: "TRX-7104", username: "dewi", date: "2026-05-24", items: [{ name: "Premium Garlic Bread", price: 25000, qty: 1 }, { name: "Choco Milkshake", price: 20000, qty: 1 }], type: "Takeaway", discount: 0, subtotal: 45000, total: 45000 }
+        ];
+
+        // --- GLOBAL APP STATES ---
+        let categories = [];
+        let menus = [];
+        let users = [];
+        let ordersHistory = [];
+        let promoSettings = {};
+        
+        let currentUserSession = null; // { username, fullname, balance, role: 'user'|'admin' }
+        let cart = []; // { menuId, qty }
+        let selectedCategoryFilter = "Semua";
+        let orderType = "Dine-in"; // 'Dine-in' | 'Takeaway'
+        
+        // Login Counter State
+        let userLoginRemainingAttempts = 3;
+        let adminLoginRemainingAttempts = 3;
+
+        // --- SYSTEM LOAD & RESET CONTROLLER ---
+        window.onload = function() {
+            loadInitialDatabase();
+            switchView('view-landing');
+            updateTerminal("DPizza siap digunakan. Silakan pilih mode peran Anda.");
+        };
+
+        function loadInitialDatabase() {
+            // Load from localStorage or set defaults
+            categories = JSON.parse(localStorage.getItem('dp_categories')) || [...DEFAULT_CATEGORIES];
+            menus = JSON.parse(localStorage.getItem('dp_menus')) || [...DEFAULT_MENUS];
+            users = JSON.parse(localStorage.getItem('dp_users')) || [...DEFAULT_USERS];
+            ordersHistory = JSON.parse(localStorage.getItem('dp_history')) || [...DEFAULT_HISTORY];
+            promoSettings = JSON.parse(localStorage.getItem('dp_promo')) || {...DEFAULT_PROMO};
+            saveDatabase();
+        }
+
+        function saveDatabase() {
+            localStorage.setItem('dp_categories', JSON.stringify(categories));
+            localStorage.setItem('dp_menus', JSON.stringify(menus));
+            localStorage.setItem('dp_users', JSON.stringify(users));
+            localStorage.setItem('dp_history', JSON.stringify(ordersHistory));
+            localStorage.setItem('dp_promo', JSON.stringify(promoSettings));
+        }
+
+        function resetSystemState() {
+            localStorage.clear();
+            loadInitialDatabase();
+            logout();
+            showCustomAlert("Reset Data", "Database berhasil di-reset ke kondisi awal praktikum!", "info");
+            updateTerminal("Database di-reset ke default oleh pengguna.");
+        }
+
+        // --- HELPER: VIEW & NAV CONTROLLER ---
+        function switchView(viewId) {
+            // Hide all main views
+            const views = ['view-landing', 'view-user-login', 'view-admin-login', 'view-user-dashboard', 'view-admin-dashboard'];
+            views.forEach(v => {
+                const el = document.getElementById(v);
+                if (el) el.classList.add('hidden');
+            });
+            // Show requested view
+            document.getElementById(viewId).classList.remove('hidden');
+
+            // Reset forms and states if necessary
+            if (viewId === 'view-user-login') {
+                userLoginRemainingAttempts = 3;
+                document.getElementById('user-login-attempts').textContent = userLoginRemainingAttempts;
+                document.getElementById('user-login-username').value = '';
+                document.getElementById('user-login-password').value = '';
+                visualizeCode('user_login_dowhile', 'Idle');
+            } else if (viewId === 'view-admin-login') {
+                adminLoginRemainingAttempts = 3;
+                document.getElementById('admin-login-attempts').textContent = adminLoginRemainingAttempts;
+                document.getElementById('admin-login-username').value = '';
+                document.getElementById('admin-login-password').value = '';
+                visualizeCode('admin_login_while', 'Idle');
+            }
+        }
+
+        function goHome() {
+            switchView('view-landing');
+        }
+
+        // --- CUSTOM POPUP DIALOG (Replaces alert) ---
+        function showCustomAlert(title, message, iconType = "info") {
+            const modal = document.getElementById('custom-alert');
+            const titleEl = document.getElementById('alert-title');
+            const messageEl = document.getElementById('alert-message');
+            const wrapper = document.getElementById('alert-icon-wrapper');
+            const icon = document.getElementById('alert-icon');
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            // Adjust icon styles
+            if (iconType === "error") {
+                wrapper.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl mb-4 bg-red-500/10 text-red-500";
+                icon.className = "fa-solid fa-triangle-exclamation";
+            } else if (iconType === "success") {
+                wrapper.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl mb-4 bg-emerald-500/10 text-emerald-400";
+                icon.className = "fa-solid fa-circle-check";
+            } else {
+                wrapper.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl mb-4 bg-amber-500/10 text-amber-500";
+                icon.className = "fa-solid fa-circle-info";
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('custom-alert').classList.add('hidden');
+        }
+
+        // --- TERMINAL LOGGER SYSTEM ---
+        function updateTerminal(text, status = "INFO") {
+            const screen = document.getElementById('terminal-screen');
+            const timestamp = new Date().toLocaleTimeString();
+            let statusColor = "text-slate-400";
+            
+            if (status === "SUCCESS") statusColor = "text-emerald-400";
+            if (status === "ERROR") statusColor = "text-red-400";
+            if (status === "ALGO") statusColor = "text-amber-400";
+
+            const logLine = document.createElement('div');
+            logLine.innerHTML = `<span class="text-slate-600">[${timestamp}]</span> <span class="${statusColor}">[${status}]</span> ${text}`;
+            screen.appendChild(logLine);
+            
+            // Auto scroll to bottom
+            screen.scrollTop = screen.scrollHeight;
+        }
+
+        // --- PSEUDO-CODE VISUALIZER TRACER ---
+        const CODING_ALGORITHMS = {
+            'user_login_dowhile': {
+                name: "Do-While Loop Login User",
+                code: `// Implementasi Login Pelanggan (Do-While)
+int sisa_kesempatan = 3;
+bool login_sukses = false;
+string input_user, input_pass;
+
+do {
+    cout << "Masukkan Username: "; cin >> input_user;
+    cout << "Masukkan Password: "; cin >> input_pass;
+
+    if (cariUser(input_user, input_pass)) {
+        cout << "Login Berhasil! Selamat datang." << endl;
+        login_sukses = true;
+        break; // keluar loop
+    } else {
+        sisa_kesempatan--;
+        cout << "Login Gagal. Sisa: " << sisa_kesempatan << endl;
+    }
+} while (sisa_kesempatan > 0 && !login_sukses);`
+            },
+            'admin_login_while': {
+                name: "While Loop Login Admin",
+                code: `// Implementasi Login Admin (While Loop)
+int sisa_kesempatan = 3;
+bool login_sukses = false;
+string input_user, input_pass;
+
+while (sisa_kesempatan > 0 && !login_sukses) {
+    cout << "Masukkan Username Admin: "; cin >> input_user;
+    cout << "Masukkan Password Admin: "; cin >> input_pass;
+
+    if (input_user == "admin" && input_pass == "admin123") {
+        cout << "Akses Admin Diterima!" << endl;
+        login_sukses = true;
+    } else {
+        sisa_kesempatan--;
+        cout << "Sandi Salah! Sisa percobaan: " << sisa_kesempatan << endl;
+        if (sisa_kesempatan == 0) {
+            cout << "Akun Admin Terkunci Sementara." << endl;
+        }
+    }
+}`
+            },
+            'bubble_sort_menu': {
+                name: "Bubble Sort Menu (Abjad A-Z)",
+                code: `// Mengurutkan menu menggunakan Bubble Sort berdasarkan Nama
+void urutkanMenu(Menu arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            // Bandingkan string (Nama Menu)
+            if (arr[j].name > arr[j + 1].name) {
+                // Tukar posisi elemen (Swap)
+                Menu temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+    cout << "Database menu berhasil diurutkan berdasarkan Abjad!" << endl;
+}`
+            },
+            'searching_history': {
+                name: "Linear Search Riwayat (by Date)",
+                code: `// Linear Search riwayat transaksi berdasarkan tanggal
+void cariRiwayat(History arr[], int n, string targetTanggal) {
+    bool ditemukan = false;
+    cout << "Hasil pencarian tanggal: " << targetTanggal << endl;
+    for (int i = 0; i < n; i++) {
+        if (arr[i].date == targetTanggal) {
+            arr[i].tampilkan();
+            ditemukan = true;
+        }
+    }
+    if (!ditemukan) {
+        cout << "Data transaksi tidak ditemukan!" << endl;
+    }
+}`
+            },
+            'searching_users': {
+                name: "Linear Search Pelanggan (by Name)",
+                code: `// Linear Search nama user dalam database admin
+void cariUser(User arr[], int n, string targetNama) {
+    bool ketemu = false;
+    for(int i = 0; i < n; i++) {
+        // substring match (tidak sensitif huruf besar-kecil)
+        if(lowercase(arr[i].fullname).contains(lowercase(targetNama))) {
+            arr[i].tampilkan();
+            ketemu = true;
+        }
+    }
+    if(!ketemu) cout << "Nama user tidak ditemukan!" << endl;
+}`
+            }
+        };
+
+        function visualizeCode(algoKey, optionalTraceValue = "") {
+            const algo = CODING_ALGORITHMS[algoKey];
+            if (!algo) return;
+            document.getElementById('current-algo-name').textContent = `Algoritma: ${algo.name}`;
+            document.getElementById('code-visualizer').textContent = algo.code;
+            
+            if (optionalTraceValue) {
+                updateTerminal(`Visualisasi kode aktif: ${algo.name}. Tracing value: ${optionalTraceValue}`, "ALGO");
+            }
+        }
+
+
+        // ==================== FITUR LOGIN & REGISTRASI ====================
+
+        // REGISTER PELANGGAN
+        function toggleUserRegModal(show) {
+            const modal = document.getElementById('modal-user-register');
+            if (show) {
+                modal.classList.remove('hidden');
+                document.getElementById('reg-username').value = '';
+                document.getElementById('reg-fullname').value = '';
+                document.getElementById('reg-password').value = '';
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function handleUserRegister() {
+            const userIn = document.getElementById('reg-username').value.trim();
+            const nameIn = document.getElementById('reg-fullname').value.trim();
+            const passIn = document.getElementById('reg-password').value.trim();
+
+            if (!userIn || !nameIn || !passIn) {
+                showCustomAlert("Gagal Registrasi", "Semua kolom input pendaftaran harus diisi lengkap!", "error");
+                return;
+            }
+
+            // Check if user already exists
+            const exist = users.find(u => u.username.toLowerCase() === userIn.toLowerCase());
+            if (exist) {
+                showCustomAlert("Gagal Registrasi", "Username telah digunakan oleh orang lain. Silakan buat yang unik!", "error");
+                return;
+            }
+
+            // Create user
+            users.push({
+                username: userIn,
+                password: passIn,
+                fullname: nameIn,
+                balance: 0 // Start with zero balance
+            });
+
+            saveDatabase();
+            toggleUserRegModal(false);
+            showCustomAlert("Registrasi Sukses", `Akun Anda (${userIn}) berhasil didaftarkan! Silakan masuk menggunakan form login.`, "success");
+            updateTerminal(`Pendaftaran berhasil: Akun baru dengan username "${userIn}" ditambahkan.`);
+        }
+
+        // LOGIN PELANGGAN (Simulating Do-While)
+        function handleUserLogin() {
+            const userIn = document.getElementById('user-login-username').value.trim();
+            const passIn = document.getElementById('user-login-password').value.trim();
+
+            if (!userIn || !passIn) {
+                showCustomAlert("Gagal Login", "Masukkan username dan password Anda terlebih dahulu!", "error");
+                return;
+            }
+
+            visualizeCode('user_login_dowhile', `Sisa kesempatan: ${userLoginRemainingAttempts}`);
+
+            // Do-while loop simulation: process the attempt
+            const foundUser = users.find(u => u.username.toLowerCase() === userIn.toLowerCase() && u.password === passIn);
+
+            if (foundUser) {
+                // Success
+                currentUserSession = {
+                    username: foundUser.username,
+                    fullname: foundUser.fullname,
+                    balance: foundUser.balance,
+                    role: 'user'
+                };
+                
+                // Set UI state
+                setSessionBadge(true, foundUser.fullname, 'user');
+                updateTerminal(`Login Pelanggan Berhasil. Selamat datang, ${foundUser.fullname}!`, "SUCCESS");
+                
+                // Show dashboard
+                switchView('view-user-dashboard');
+                setUserTab('order');
+                updateUserDashboardState();
+            } else {
+                // Fail
+                userLoginRemainingAttempts--;
+                document.getElementById('user-login-attempts').textContent = userLoginRemainingAttempts;
+                
+                updateTerminal(`Gagal login untuk username: "${userIn}". Sisa percobaan: ${userLoginRemainingAttempts}`, "ERROR");
+
+                if (userLoginRemainingAttempts <= 0) {
+                    showCustomAlert("Akses Terkunci", "Kesempatan login Anda habis (3x salah)! Halaman akan di-reset.", "error");
+                    updateTerminal("Sistem mengunci proses login user karena kegagalan berulang.", "ERROR");
+                    goHome();
+                } else {
+                    showCustomAlert("Login Gagal", `Username atau Password salah! Sisa kesempatan: ${userLoginRemainingAttempts} kali.`, "error");
+                }
+            }
+        }
+
+        // LOGIN ADMIN (Simulating While Loop)
+        function handleAdminLogin() {
+            const userIn = document.getElementById('admin-login-username').value.trim();
+            const passIn = document.getElementById('admin-login-password').value.trim();
+
+            if (!userIn || !passIn) {
+                showCustomAlert("Gagal Login Admin", "Kolom admin dan password tidak boleh kosong!", "error");
+                return;
+            }
+
+            visualizeCode('admin_login_while', `Sisa kesempatan: ${adminLoginRemainingAttempts}`);
+
+            // While-like condition evaluation
+            if (userIn === "admin" && passIn === "admin123") {
+                currentUserSession = {
+                    username: "admin",
+                    fullname: "System Administrator",
+                    balance: 0,
+                    role: 'admin'
+                };
+
+                setSessionBadge(true, "Administrator", 'admin');
+                updateTerminal(`Akses Administratif Diterima. Dashboard manajemen dibuka.`, "SUCCESS");
+                
+                switchView('view-admin-dashboard');
+                setAdminTab('menu');
+            } else {
+                adminLoginRemainingAttempts--;
+                document.getElementById('admin-login-attempts').textContent = adminLoginRemainingAttempts;
+                updateTerminal(`Sandi admin salah! Kesempatan tersisa: ${adminLoginRemainingAttempts}`, "ERROR");
+
+                if (adminLoginRemainingAttempts <= 0) {
+                    showCustomAlert("Akses Admin Diblokir", "Anda gagal login admin sebanyak 3 kali. Kembali ke beranda.", "error");
+                    goHome();
+                } else {
+                    showCustomAlert("Sandi Admin Salah", `Kredensial admin salah! Sisa percobaan: ${adminLoginRemainingAttempts} kali.`, "error");
+                }
+            }
+        }
+
+        // SET SESSION HEADER UI
+        function setSessionBadge(isLoggedIn, name, role) {
+            const badge = document.getElementById('session-badge');
+            const dot = document.getElementById('session-dot');
+            const text = document.getElementById('session-text');
+            const balanceDisp = document.getElementById('user-balance-display');
+
+            if (isLoggedIn) {
+                badge.classList.remove('border-slate-700');
+                if (role === 'admin') {
+                    badge.classList.add('border-red-500/30', 'bg-red-950/20');
+                    dot.className = "w-2 h-2 rounded-full bg-red-500 animate-ping";
+                    text.innerHTML = `Admin: <span class="text-red-400 font-bold">${name}</span>`;
+                    balanceDisp.classList.add('hidden');
+                } else {
+                    badge.classList.add('border-amber-500/30', 'bg-amber-950/20');
+                    dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+                    text.innerHTML = `User: <span class="text-amber-400 font-bold">${name}</span>`;
+                    balanceDisp.classList.remove('hidden');
+                    document.getElementById('nav-balance').textContent = currentUserSession.balance.toLocaleString('id-ID');
+                }
+            } else {
+                badge.className = "bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 flex items-center gap-2";
+                dot.className = "w-2 h-2 rounded-full bg-red-500";
+                text.textContent = "Guest Mode";
+                balanceDisp.classList.add('hidden');
+            }
+        }
+
+        // LOGOUT
+        function logout() {
+            currentUserSession = null;
+            cart = [];
+            setSessionBadge(false);
+            updateTerminal("Pengguna berhasil keluar dari sesi.");
+            goHome();
+        }
+
+
+        // ==================== FITUR PELANGGAN (USER) ====================
+
+        function setUserTab(tabName) {
+            const tabs = ['order', 'history', 'topup'];
+            tabs.forEach(t => {
+                document.getElementById(`user-tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = "bg-slate-800 hover:bg-slate-750 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all";
+            });
+
+            document.getElementById(`user-tab-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (tabName === 'order') activeBtn.className = "bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all";
+            if (tabName === 'history') activeBtn.className = "bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all";
+            if (tabName === 'topup') activeBtn.className = "bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all";
+
+            if (tabName === 'history') {
+                searchHistoryByDate(); // Render history data
+            }
+            if (tabName === 'topup') {
+                document.getElementById('topup-current-balance').textContent = currentUserSession.balance.toLocaleString('id-ID');
+            }
+        }
+
+        // UPDATE STATE DASHBOARD
+        function updateUserDashboardState() {
+            renderUserCategories();
+            renderUserMenu();
+            renderCart();
+            document.getElementById('nav-balance').textContent = currentUserSession.balance.toLocaleString('id-ID');
+        }
+
+        // RENDER KATEGORI DI BAGIAN PELANGGAN
+        function renderUserCategories() {
+            const container = document.getElementById('user-categories-container');
+            container.innerHTML = '';
+
+            // Add "Semua" Filter Button
+            const allBtn = document.createElement('button');
+            allBtn.onclick = () => filterByCategory("Semua");
+            allBtn.className = `px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${selectedCategoryFilter === 'Semua' ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 hover:bg-slate-800'}`;
+            allBtn.textContent = "Semua Menu";
+            container.appendChild(allBtn);
+
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.onclick = () => filterByCategory(cat);
+                btn.className = `px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${selectedCategoryFilter === cat ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 hover:bg-slate-800'}`;
+                btn.textContent = cat;
+                container.appendChild(btn);
+            });
+        }
+
+        function filterByCategory(catName) {
+            selectedCategoryFilter = catName;
+            updateTerminal(`Memfilter menu kategori: "${catName}"`);
+            renderUserCategories();
+            renderUserMenu();
+        }
+
+        // RENDER DAFTAR MENU DI PELANGGAN
+        function renderUserMenu() {
+            const grid = document.getElementById('user-menu-grid');
+            grid.innerHTML = '';
+
+            // Filter menus
+            let filtered = menus;
+            if (selectedCategoryFilter !== "Semua") {
+                filtered = menus.filter(m => m.category === selectedCategoryFilter);
+            }
+
+            filtered.forEach(m => {
+                const isBestSeller = m.bestSeller;
+                
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800/80 hover:border-amber-500/30 flex flex-col justify-between transition-all duration-300";
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] bg-slate-850 text-slate-400 px-2.5 py-0.5 rounded font-mono">${m.category}</span>
+                            ${isBestSeller ? '<span class="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-fire text-[9px]"></i> Best Seller</span>' : ''}
+                        </div>
+                        <h4 class="font-bold text-slate-100 text-sm mb-1">${m.name}</h4>
+                        <p class="text-xs font-black text-amber-500">Rp ${m.price.toLocaleString('id-ID')}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-900 flex justify-end">
+                        <button onclick="addToCart(${m.id})" class="bg-slate-800 hover:bg-amber-500 text-slate-200 hover:text-slate-950 text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 transition-all">
+                            <i class="fa-solid fa-cart-plus"></i> Tambah
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // FITUR PENGURUTAN DATA MENU (BUBBLE SORT)
+        function sortMenuData() {
+            visualizeCode('bubble_sort_menu', "Sedang mengurutkan seluruh database menu");
+
+            // Deep clone menu array to sort
+            let n = menus.length;
+            
+            // Visualizing a bubble sort loop in JS:
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (menus[j].name.localeCompare(menus[j+1].name) > 0) {
+                        // Swap
+                        let temp = menus[j];
+                        menus[j] = menus[j+1];
+                        menus[j+1] = temp;
+                    }
+                }
+            }
+
+            saveDatabase();
+            renderUserMenu();
+            showCustomAlert("Data Diurutkan", "Database menu berhasil diurutkan berdasarkan Abjad (A-Z) menggunakan algoritma Bubble Sort!", "success");
+            updateTerminal("Pengurutan abjad menu dilakukan di RAM local.");
+        }
+
+        // TIPE PESANAN
+        function changeOrderType(type) {
+            orderType = type;
+            updateTerminal(`Tipe pesanan diubah ke: ${type}`);
+        }
+
+        // KERANJANG BELANJA
+        function addToCart(menuId) {
+            const menu = menus.find(m => m.id === menuId);
+            if (!menu) return;
+
+            const exist = cart.find(item => item.menuId === menuId);
+            if (exist) {
+                exist.qty++;
+            } else {
+                cart.push({ menuId: menuId, qty: 1 });
+            }
+
+            updateTerminal(`Menambahkan "${menu.name}" ke keranjang belanja.`);
+            renderCart();
+        }
+
+        function updateCartQty(menuId, change) {
+            const index = cart.findIndex(item => item.menuId === menuId);
+            if (index === -1) return;
+
+            cart[index].qty += change;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const countBadge = document.getElementById('cart-item-count');
+            container.innerHTML = '';
+
+            let totalItems = 0;
+            let subtotal = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-500 py-10 text-xs">Keranjang masih kosong</div>';
+                document.getElementById('cart-subtotal').textContent = "0";
+                document.getElementById('cart-discount').textContent = "0";
+                document.getElementById('cart-total').textContent = "0";
+                countBadge.textContent = "0 Item";
+                return;
+            }
+
+            cart.forEach(item => {
+                const menu = menus.find(m => m.id === item.menuId);
+                if (!menu) return;
+
+                totalItems += item.qty;
+                const itemTotal = menu.price * item.qty;
+                subtotal += itemTotal;
+
+                const row = document.createElement('div');
+                row.className = "bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 flex items-center justify-between text-xs";
+                row.innerHTML = `
+                    <div class="space-y-0.5">
+                        <p class="font-bold text-slate-200">${menu.name}</p>
+                        <p class="text-[10px] text-slate-400">Rp ${menu.price.toLocaleString('id-ID')} × ${item.qty}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateCartQty(${menu.id}, -1)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 rounded flex items-center justify-center font-bold text-slate-300">-</button>
+                        <span class="font-mono text-xs w-4 text-center">${item.qty}</span>
+                        <button onclick="updateCartQty(${menu.id}, 1)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 rounded flex items-center justify-center font-bold text-slate-300">+</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+            countBadge.textContent = `${totalItems} Item`;
+
+            // Calculate Promo Discount
+            let discount = 0;
+            if (subtotal >= promoSettings.minPurchase) {
+                discount = promoSettings.discount;
+                document.getElementById('cart-discount-row').classList.remove('hidden');
+            } else {
+                document.getElementById('cart-discount-row').classList.add('hidden');
+            }
+
+            const total = Math.max(0, subtotal - discount);
+
+            document.getElementById('cart-subtotal').textContent = subtotal.toLocaleString('id-ID');
+            document.getElementById('cart-discount').textContent = discount.toLocaleString('id-ID');
+            document.getElementById('cart-total').textContent = total.toLocaleString('id-ID');
+        }
+
+        // PROSES PEMBAYARAN & CHECKOUT
+        function checkoutCart() {
+            if (cart.length === 0) {
+                showCustomAlert("Keranjang Kosong", "Pilih menu pesanan Anda sebelum melakukan pembayaran!", "error");
+                return;
+            }
+
+            let subtotal = 0;
+            cart.forEach(item => {
+                const menu = menus.find(m => m.id === item.menuId);
+                if (menu) subtotal += (menu.price * item.qty);
+            });
+
+            let discount = 0;
+            if (subtotal >= promoSettings.minPurchase) {
+                discount = promoSettings.discount;
+            }
+
+            const finalTotal = Math.max(0, subtotal - discount);
+
+            // Periksa Saldo
+            if (currentUserSession.balance < finalTotal) {
+                showCustomAlert("Saldo Kurang", `Gagal Bayar! Saldo Anda (Rp ${currentUserSession.balance.toLocaleString('id-ID')}) tidak mencukupi untuk melakukan transaksi sebesar Rp ${finalTotal.toLocaleString('id-ID')}. Silakan isi ulang saldo Anda terlebih dahulu.`, "error");
+                updateTerminal("Transaksi ditolak: Saldo user tidak mencukupi.", "ERROR");
+                return;
+            }
+
+            // Potong Saldo Akun di database
+            const userIndex = users.findIndex(u => u.username === currentUserSession.username);
+            users[userIndex].balance -= finalTotal;
+            currentUserSession.balance = users[userIndex].balance;
+
+            // Generate ID Transaksi Unik
+            const trxId = "TRX-" + Math.floor(1000 + Math.random() * 9000);
+            const today = new Date().toISOString().split('T')[0];
+
+            // Build item list detail
+            const purchasedItems = cart.map(item => {
+                const menu = menus.find(m => m.id === item.menuId);
+                return {
+                    name: menu.name,
+                    price: menu.price,
+                    qty: item.qty
+                };
+            });
+
+            // Catat Riwayat Transaksi baru
+            const newTrx = {
+                id: trxId,
+                username: currentUserSession.username,
+                date: today,
+                items: purchasedItems,
+                type: orderType,
+                discount: discount,
+                subtotal: subtotal,
+                total: finalTotal
+            };
+
+            ordersHistory.push(newTrx);
+            saveDatabase();
+
+            updateTerminal(`Pemesanan berhasil diselesaikan. ID Transaksi: ${trxId}. Total: Rp ${finalTotal.toLocaleString('id-ID')}`, "SUCCESS");
+
+            // Tampilkan struk
+            openReceiptModal(newTrx);
+
+            // Kosongkan keranjang
+            cart = [];
+            updateUserDashboardState();
+        }
+
+        // CEK & CETAK STRUK PEMBAYARAN MODAL
+        function openReceiptModal(trxData) {
+            document.getElementById('rec-id').textContent = trxData.id;
+            document.getElementById('rec-date').textContent = trxData.date;
+            document.getElementById('rec-user').textContent = trxData.username;
+            document.getElementById('rec-type').textContent = trxData.type;
+
+            const listContainer = document.getElementById('rec-items-list');
+            listContainer.innerHTML = '';
+
+            trxData.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between text-[10px]";
+                div.innerHTML = `<span>${item.name} x${item.qty}</span><span>Rp ${(item.price * item.qty).toLocaleString('id-ID')}</span>`;
+                listContainer.appendChild(div);
+            });
+
+            document.getElementById('rec-subtotal').textContent = trxData.subtotal.toLocaleString('id-ID');
+            document.getElementById('rec-discount').textContent = trxData.discount.toLocaleString('id-ID');
+            document.getElementById('rec-total').textContent = trxData.total.toLocaleString('id-ID');
+
+            document.getElementById('modal-receipt').classList.remove('hidden');
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('modal-receipt').classList.add('hidden');
+        }
+
+        // TOP-UP SALDO
+        function selectTopupAmount(amount) {
+            document.getElementById('topup-custom-amount').value = amount;
+        }
+
+        function handleTopup() {
+            const customVal = parseInt(document.getElementById('topup-custom-amount').value);
+            if (!customVal || customVal <= 0) {
+                showCustomAlert("Gagal Top-Up", "Silakan masukkan nominal pengisian saldo yang valid!", "error");
+                return;
+            }
+
+            // Amankan update saldo ke database
+            const userIndex = users.findIndex(u => u.username === currentUserSession.username);
+            users[userIndex].balance += customVal;
+            currentUserSession.balance = users[userIndex].balance;
+
+            saveDatabase();
+            updateUserDashboardState();
+            document.getElementById('topup-current-balance').textContent = currentUserSession.balance.toLocaleString('id-ID');
+            document.getElementById('topup-custom-amount').value = '';
+
+            showCustomAlert("Isi Ulang Sukses", `Dana sebesar Rp ${customVal.toLocaleString('id-ID')} berhasil ditambahkan ke saldo akun Anda.`, "success");
+            updateTerminal(`Top-Up saldo sebesar Rp ${customVal.toLocaleString('id-ID')} berhasil diproses ke database.`, "SUCCESS");
+        }
+
+        // PENCARIAN DATA RIWAYAT TRANSAKSI BERDASARKAN TANGGAL
+        function searchHistoryByDate() {
+            const searchDate = document.getElementById('history-search-date').value;
+            const tbody = document.getElementById('user-history-tbody');
+            const emptyLabel = document.getElementById('history-empty');
+            tbody.innerHTML = '';
+
+            // Filter riwayat hanya untuk pengguna yang sedang aktif login
+            let userHistory = ordersHistory.filter(h => h.username === currentUserSession.username);
+
+            visualizeCode('searching_history', searchDate ? `Cari transaksi tanggal: ${searchDate}` : 'Cari semua transaksi user');
+
+            if (searchDate) {
+                userHistory = userHistory.filter(h => h.date === searchDate);
+            }
+
+            if (userHistory.length === 0) {
+                emptyLabel.classList.remove('hidden');
+                return;
+            }
+            emptyLabel.classList.add('hidden');
+
+            userHistory.forEach(h => {
+                const itemsSummary = h.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-bold text-slate-300 font-mono">${h.id}</td>
+                    <td class="px-4 py-3 text-slate-400">${h.date}</td>
+                    <td class="px-4 py-3"><span class="bg-slate-950 px-2.5 py-0.5 rounded border border-slate-800 text-[10px] font-semibold">${h.type}</span></td>
+                    <td class="px-4 py-3 max-w-xs truncate" title="${itemsSummary}">${itemsSummary}</td>
+                    <td class="px-4 py-3 text-emerald-400">Rp ${h.discount.toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3 font-bold text-amber-500">Rp ${h.total.toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick='printFromHistory("${h.id}")' class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 text-[10px] font-bold"><i class="fa-solid fa-receipt"></i> Struk</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function printFromHistory(trxId) {
+            const data = ordersHistory.find(h => h.id === trxId);
+            if (data) {
+                openReceiptModal(data);
+                updateTerminal(`Mencetak ulang struk lama: ${trxId}`);
+            }
+        }
+
+
+        // ==================== FITUR ADMINISTRATOR (ADMIN) ====================
+
+        function setAdminTab(tabName) {
+            const tabs = ['menu', 'users', 'reports'];
+            tabs.forEach(t => {
+                document.getElementById(`admin-tab-${t}`).classList.add('hidden');
+                document.getElementById(`admin-tab-btn-${t}`).className = "bg-slate-800 hover:bg-slate-750 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all";
+            });
+
+            document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`admin-tab-btn-${tabName}`).className = "bg-red-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all";
+
+            if (tabName === 'menu') {
+                renderAdminCategories();
+                renderAdminMenu();
+            }
+            if (tabName === 'users') {
+                searchUsersByName();
+            }
+            if (tabName === 'reports') {
+                renderAdminPromoAndReports();
+            }
+        }
+
+        // 1. MANAJEMEN KATEGORI (ADMIN)
+        function renderAdminCategories() {
+            const list = document.getElementById('admin-categories-list');
+            list.innerHTML = '';
+
+            categories.forEach((cat, index) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 text-xs";
+                div.innerHTML = `
+                    <span class="font-bold text-slate-300">${cat}</span>
+                    <div class="flex gap-1">
+                        <button onclick="openCategoryModal('${cat}')" class="text-blue-400 hover:text-blue-300 p-1" title="Edit Kategori"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteCategory('${cat}')" class="text-red-400 hover:text-red-300 p-1" title="Hapus Kategori"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function openCategoryModal(catName = "") {
+            const modal = document.getElementById('modal-category-edit');
+            const title = document.getElementById('category-modal-title');
+            const input = document.getElementById('cat-input-name');
+            const idInput = document.getElementById('cat-input-id');
+
+            if (catName) {
+                title.textContent = "Edit Nama Kategori";
+                input.value = catName;
+                idInput.value = catName; // Store original
+            } else {
+                title.textContent = "Tambah Kategori Baru";
+                input.value = "";
+                idInput.value = "";
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('modal-category-edit').classList.add('hidden');
+        }
+
+        function saveCategory() {
+            const inputVal = document.getElementById('cat-input-name').value.trim();
+            const originalVal = document.getElementById('cat-input-id').value;
+
+            if (!inputVal) {
+                showCustomAlert("Gagal Menyimpan", "Kolom nama kategori tidak boleh kosong!", "error");
+                return;
+            }
+
+            if (originalVal) {
+                // Edit mode
+                const index = categories.indexOf(originalVal);
+                if (index !== -1) {
+                    categories[index] = inputVal;
+                    // Update menu categories as well
+                    menus.forEach(m => {
+                        if (m.category === originalVal) m.category = inputVal;
+                    });
+                    updateTerminal(`Kategori di-edit: "${originalVal}" diubah menjadi "${inputVal}"`);
+                }
+            } else {
+                // Create mode
+                if (categories.includes(inputVal)) {
+                    showCustomAlert("Gagal", "Nama kategori tersebut sudah ada dalam database!", "error");
+                    return;
+                }
+                categories.push(inputVal);
+                updateTerminal(`Kategori baru ditambahkan: "${inputVal}"`);
+            }
+
+            saveDatabase();
+            closeCategoryModal();
+            renderAdminCategories();
+            showCustomAlert("Sukses", "Data Kategori berhasil disimpan ke database!", "success");
+        }
+
+        function deleteCategory(catName) {
+            // Confirm modal simulation
+            const index = categories.indexOf(catName);
+            if (index === -1) return;
+
+            categories.splice(index, 1);
+            // Delete associated menus
+            menus = menus.filter(m => m.category !== catName);
+
+            saveDatabase();
+            renderAdminCategories();
+            updateTerminal(`Kategori "${catName}" dan semua menu di dalamnya telah dihapus.`, "ERROR");
+            showCustomAlert("Kategori Dihapus", `Kategori "${catName}" beserta semua menunya telah terhapus dari sistem.`, "success");
+        }
+
+        // 2. MANAJEMEN MENU RESTO (ADMIN)
+        function renderAdminMenu() {
+            const tbody = document.getElementById('admin-menu-tbody');
+            tbody.innerHTML = '';
+
+            menus.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-bold text-slate-300">${m.name}</td>
+                    <td class="px-4 py-3"><span class="bg-slate-950 px-2 py-0.5 rounded text-slate-400 font-semibold">${m.category}</span></td>
+                    <td class="px-4 py-3 text-amber-500 font-bold">Rp ${m.price.toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3">
+                        ${m.bestSeller ? '<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold">Best Seller</span>' : '<span class="text-slate-500 text-[10px]">-</span>'}
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-1">
+                        <button onclick="openMenuModal(${m.id})" class="text-blue-400 hover:text-blue-300 p-1" title="Edit Menu"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteMenu(${m.id})" class="text-red-400 hover:text-red-300 p-1" title="Hapus Menu"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openMenuModal(menuId = 0) {
+            const modal = document.getElementById('modal-menu-edit');
+            const title = document.getElementById('menu-modal-title');
+            const inName = document.getElementById('menu-input-name');
+            const inCategory = document.getElementById('menu-input-category');
+            const inPrice = document.getElementById('menu-input-price');
+            const inBest = document.getElementById('menu-input-bestseller');
+            const inId = document.getElementById('menu-input-id');
+
+            // Populate category select options
+            inCategory.innerHTML = '';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                inCategory.appendChild(opt);
+            });
+
+            if (menuId) {
+                title.textContent = "Edit Menu Makanan / Minuman";
+                const m = menus.find(item => item.id === menuId);
+                if (m) {
+                    inName.value = m.name;
+                    inCategory.value = m.category;
+                    inPrice.value = m.price;
+                    inBest.value = m.bestSeller ? "true" : "false";
+                    inId.value = m.id;
+                }
+            } else {
+                title.textContent = "Tambah Menu Makanan / Minuman";
+                inName.value = "";
+                inCategory.selectedIndex = 0;
+                inPrice.value = "";
+                inBest.value = "false";
+                inId.value = "";
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeMenuModal() {
+            document.getElementById('modal-menu-edit').classList.add('hidden');
+        }
+
+        function saveMenu() {
+            const name = document.getElementById('menu-input-name').value.trim();
+            const category = document.getElementById('menu-input-category').value;
+            const price = parseInt(document.getElementById('menu-input-price').value);
+            const bestSeller = document.getElementById('menu-input-bestseller').value === "true";
+            const id = document.getElementById('menu-input-id').value;
+
+            if (!name || isNaN(price) || price <= 0) {
+                showCustomAlert("Gagal Menyimpan", "Isi lengkap semua form menu secara benar!", "error");
+                return;
+            }
+
+            if (id) {
+                // Edit menu
+                const idx = menus.findIndex(m => m.id === parseInt(id));
+                if (idx !== -1) {
+                    menus[idx] = { id: parseInt(id), name, category, price, bestSeller };
+                    updateTerminal(`Menu diperbarui: "${name}" [Kategori: ${category}, Harga: Rp ${price}]`);
+                }
+            } else {
+                // Add new menu
+                const newId = menus.length > 0 ? Math.max(...menus.map(m => m.id)) + 1 : 1;
+                menus.push({ id: newId, name, category, price, bestSeller });
+                updateTerminal(`Menu kasir baru ditambahkan: "${name}" [Harga: Rp ${price}]`);
+            }
+
+            saveDatabase();
+            closeMenuModal();
+            renderAdminMenu();
+            showCustomAlert("Sukses", "Data kasir menu berhasil disimpan!", "success");
+        }
+
+        function deleteMenu(id) {
+            const m = menus.find(item => item.id === id);
+            if (!m) return;
+
+            menus = menus.filter(item => item.id !== id);
+            saveDatabase();
+            renderAdminMenu();
+            updateTerminal(`Menu "${m.name}" dihapus dari database restoran.`, "ERROR");
+            showCustomAlert("Menu Dihapus", `Menu "${m.name}" berhasil dihapus dari daftar menu restoran.`, "success");
+        }
+
+        // 3. PENCARIAN USER BERDASARKAN NAMA (ADMIN)
+        function searchUsersByName() {
+            const query = document.getElementById('admin-search-user-input').value.trim().toLowerCase();
+            const tbody = document.getElementById('admin-users-tbody');
+            tbody.innerHTML = '';
+
+            visualizeCode('searching_users', query ? `Mencari nama mengandung: "${query}"` : "Cari semua user");
+
+            const filtered = users.filter(u => u.fullname.toLowerCase().includes(query) || u.username.toLowerCase().includes(query));
+
+            filtered.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-bold text-slate-300 font-mono">${u.username}</td>
+                    <td class="px-4 py-3 text-slate-400 font-medium">${u.fullname}</td>
+                    <td class="px-4 py-3 text-emerald-400 font-bold">Rp ${u.balance.toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="adminTopupUser('${u.username}')" class="bg-emerald-950 text-emerald-400 hover:bg-emerald-900 border border-emerald-500/20 px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-plus-circle"></i> Beri Saldo Gratis</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function adminTopupUser(username) {
+            const idx = users.findIndex(u => u.username === username);
+            if (idx === -1) return;
+
+            users[idx].balance += 50000;
+            saveDatabase();
+            searchUsersByName();
+            updateTerminal(`Admin menyuntikkan saldo cuma-cuma Rp 50.000 ke akun "${username}"`, "SUCCESS");
+            showCustomAlert("Bonus Saldo", `Bonus Rp 50.000 sukses disuntikkan ke akun ${users[idx].fullname}!`, "success");
+        }
+
+        // 4. LAPORAN PENJUALAN & PROMO (ADMIN)
+        function renderAdminPromoAndReports() {
+            // Load promo data
+            document.getElementById('promo-min-purchase').value = promoSettings.minPurchase;
+            document.getElementById('promo-discount-amount').value = promoSettings.discount;
+
+            // Load financial stats
+            let totalRevenue = 0;
+            ordersHistory.forEach(h => totalRevenue += h.total);
+
+            document.getElementById('admin-total-income').textContent = totalRevenue.toLocaleString('id-ID');
+            document.getElementById('admin-total-orders').textContent = ordersHistory.length;
+
+            // Populate all sales history report table
+            const tbody = document.getElementById('admin-reports-tbody');
+            tbody.innerHTML = '';
+
+            ordersHistory.forEach(h => {
+                const itemsSummary = h.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 text-[11px] transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3">
+                        <p class="font-bold font-mono text-slate-300">${h.id}</p>
+                        <p class="text-[9px] text-slate-500">Oleh: ${h.username}</p>
+                    </td>
+                    <td class="px-4 py-3 text-slate-400">${h.date}</td>
+                    <td class="px-4 py-3 max-w-xs truncate" title="${itemsSummary}">${itemsSummary}</td>
+                    <td class="px-4 py-3 text-red-400">Rp ${h.discount.toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3 text-slate-400">Rp ${h.subtotal.toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3 font-bold text-emerald-400">Rp ${h.total.toLocaleString('id-ID')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function savePromoSettings() {
+            const min = parseInt(document.getElementById('promo-min-purchase').value);
+            const disc = parseInt(document.getElementById('promo-discount-amount').value);
+
+            if (isNaN(min) || min < 0 || isNaN(disc) || disc < 0) {
+                showCustomAlert("Form Salah", "Pengaturan promo pembelian harus bernilai angka positif!", "error");
+                return;
+            }
+
+            promoSettings.minPurchase = min;
+            promoSettings.discount = disc;
+            saveDatabase();
+
+            showCustomAlert("Promo Diperbarui", `Min Pembelian: Rp ${min.toLocaleString('id-ID')}, Diskon: Rp ${disc.toLocaleString('id-ID')} berhasil disimpan!`, "success");
+            updateTerminal(`Konfigurasi promo diubah oleh admin: Min. Belanja Rp ${min}, Diskon Rp ${disc}`);
+        }
+    </script>
+</body>
+</html>
